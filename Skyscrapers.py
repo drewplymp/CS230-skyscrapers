@@ -101,7 +101,7 @@ def skyscrapersPerCity(dat, max_cities=10):
 
     # Plotting the bar chart (Matplotlib code examples formatting)
     plt.figure(figsize=(10, 6))
-    plt.bar(filtered_data['Name'], filtered_data['Height'], color='steelblue')
+    plt.bar(filtered_data['Name'], filtered_data['Height'], color='steelblue') #x-data, y-data, color
     plt.xlabel('Skyscraper Name')
     plt.ylabel('Height (m)')
     plt.title(f'Skyscraper Heights in {selected_city}')
@@ -132,22 +132,22 @@ def scatterPlotSkyscrapers(dat):
         # Add the Height-to-Floor Ratio column for the table only
         top_skyscrapers['Height-to-Floor Ratio'] = top_skyscrapers['Height'] / top_skyscrapers['Floors']
 
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(10, 6)) #width, height
 
         # Generate unique colors for each city
         unique_cities = filtered_data['City'].unique()
         colors = plt.cm.tab10(range(len(unique_cities)))
 
         # Plot each city's data in a separate layer
-        for i, city in enumerate(unique_cities):
-            city_data = filtered_data[filtered_data['City'] == city]
+        for i, city in enumerate(unique_cities): #pairs the city and i as unique pairs of data so that they are assigned unique colors
+            city_data = filtered_data[filtered_data['City'] == city] #Only include data from city selected
             plt.scatter(
-                city_data['Floors'],
-                city_data['Height'],
-                color=colors[i],
-                s=50,
-                alpha=0.8,
-                edgecolors='k',
+                city_data['Floors'], #X-axis
+                city_data['Height'], #Y-axis
+                color=colors[i], #Each instance of i is assigned a unique color
+                s=50, #Size
+                alpha=0.8, #Transparency
+                edgecolors='k', #read that this draws an outline around dot and helps with visibility
                 label=city  # City name for legend
             )
 
@@ -170,34 +170,29 @@ def scatterPlotSkyscrapers(dat):
 
 def skyscraperMaterialAnalysis(dat):
     # [DA6] Create a pivot table to analyze average skyscraper height by material
-    material_pivot = dat.pivot_table(index='Material', values='Height', aggfunc='mean').reset_index()
+    material_pivot = dat.pivot_table(index='Material', values='Height', aggfunc='mean').reset_index() #Group by, calculate values for, find the average
 
-    # [PY2] Return data and a sorted list of materials
-    def getMaterialData(dataframe):
+    # [PY2] Return data and sorted list of materials
+    def getMaterialData(dataframe): #Nest function so that I can call and complete outer function
         # Replace "concrete/steel" with "steel/concrete" for consistency
         dataframe['Material'] = dataframe['Material'].replace({"concrete/steel": "steel/concrete"})
 
-        materials = sorted([row['Material'] for _, row in dataframe.iterrows()])  # [PY4] List comprehension
+        materials = sorted([row['Material'] for i, row in dataframe.iterrows()])  # [PY4] List comprehension -> Sort and iterate through each row and takes the index
         return dataframe, materials
 
-    pivot_data, material_list = getMaterialData(material_pivot)
+    pivot_data, material_list = getMaterialData(material_pivot) #Needed to call materialData function for material analysis
 
-    # Handle empty data case
-    if pivot_data.empty:
-        st.warning("No skyscraper data available for the selected criteria.")
-
-    plt.figure(figsize=(10, 6))
-    plt.bar(pivot_data['Material'], pivot_data['Height'], color='teal')
+    plt.figure(figsize=(10, 6)) #Width, Height
+    plt.bar(pivot_data['Material'], pivot_data['Height'], color='steelblue')
     plt.xlabel('Material')
     plt.ylabel('Average Height (m)')
     plt.title('Average Skyscraper Height by Material')
     plt.xticks(rotation=45)
-    plt.tight_layout()
 
     # [VIZ3] Display the plot
     st.pyplot(plt)
 
-    # Display the pivot data in a table ([VIZ1]: Table visualization)
+    # [VIZ1] Display the pivot data in a table
     st.subheader("Material Analysis Table")
     st.write(pivot_data)
 
