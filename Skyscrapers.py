@@ -179,21 +179,22 @@ def scatterPlotSkyscrapers(dat):
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")  # [PY3] Handle potential errors
 
+def getMaterialData(dataframe):
+    # Replace "concrete/steel" with "steel/concrete" for consistency
+    dataframe['Material'] = dataframe['Material'].replace({"concrete/steel": "steel/concrete"})
+
+    # List comprehension -> Sort and iterate through each row and takes the index
+    materials = sorted([row['Material'] for i, row in dataframe.iterrows()])
+    return dataframe, materials
+
 def skyscraperMaterialAnalysis(dat):
     # [DA6] Create a pivot table to analyze average skyscraper height by material
-    material_pivot = dat.pivot_table(index='Material', values='Height', aggfunc='mean').reset_index() #Group by, calculate values for, find the average
+    material_pivot = dat.pivot_table(index='Material', values='Height', aggfunc='mean').reset_index()  # Group by, calculate values for, find the average
 
-    # [PY2] Return data and sorted list of materials
-    def getMaterialData(dataframe): #Nest function so that I can call and complete outer function
-        # Replace "concrete/steel" with "steel/concrete" for consistency
-        dataframe['Material'] = dataframe['Material'].replace({"concrete/steel": "steel/concrete"})
+    # [PY2] Get material data
+    pivot_data, material_list = getMaterialData(material_pivot)  # Calling previous function to get the material data
 
-        materials = sorted([row['Material'] for i, row in dataframe.iterrows()])  # [PY4] List comprehension -> Sort and iterate through each row and takes the index
-        return dataframe, materials
-
-    pivot_data, material_list = getMaterialData(material_pivot) #Needed to call materialData function for material analysis
-
-    plt.figure(figsize=(10, 6)) #Width, Height
+    plt.figure(figsize=(10, 6))  # Width, Height
     plt.bar(pivot_data['Material'], pivot_data['Height'], color='steelblue')
     plt.xlabel('Material')
     plt.ylabel('Average Height (m)')
