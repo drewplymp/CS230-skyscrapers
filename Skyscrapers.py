@@ -1,9 +1,3 @@
-import numpy as np
-import pandas as pd
-import streamlit as st
-import pydeck as pdk
-import matplotlib.pyplot as plt
-
 '''
 Name: Andrew Plympton
 CS230: Section 6
@@ -15,6 +9,12 @@ This data shows a map, scatterplot, sliderbar, and barcharts which explain the d
 I used packages like pydeck, matplotlib, numpy, pandas, and streamlit to assist with making the data more easily digestible.
 The part I thought was the most difficult was the map where I layered the data and created points which could be hovered over.
 '''
+
+import numpy as np
+import pandas as pd
+import streamlit as st
+import pydeck as pdk
+import matplotlib.pyplot as plt
 
 def getData():
 
