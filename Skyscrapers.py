@@ -4,6 +4,17 @@ import streamlit as st
 import pydeck as pdk
 import matplotlib.pyplot as plt
 
+'''
+Name: Andrew Plympton
+CS230: Section 6
+Data: Skyscrapers
+Website URL: https://andrewplymptonpythonfinal.streamlit.app/
+
+Description: This data shows a map, scatterplot, sliderbar, and barcharts which explain the data in an interactive and easily digestible way.
+This data shows a map, scatterplot, sliderbar, and barcharts which explain the data in an interactive and easily digestible way.
+I used packages like pydeck, matplotlib, numpy, pandas, and streamlit to assist with making the data more easily digestible.
+The part I thought was the most difficult was the map where I layered the data and created points which could be hovered over.
+'''
 
 def getData():
 
@@ -44,7 +55,7 @@ def scraperByCityMap(dat, inputNames):
     mapCenterLat = selectedCity['Latitude'].mean()
     mapCenterLon = selectedCity['Longitude'].mean()
 
-    # Round building height to 3 decimals
+    # Round building height to 2 decimals
     selectedCity['Height'] = selectedCity['Height'].round(2)
 
 
