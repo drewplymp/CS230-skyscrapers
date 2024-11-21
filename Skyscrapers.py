@@ -201,6 +201,33 @@ def skyscraperMaterialAnalysis(dat):
     st.subheader("Material Analysis Table")
     st.write(pivot_data)
 
+def countHeightSlider(dat):
+
+    #Get the max and min heights
+    minHeight = dat['Height'].min()
+    maxHeight = dat['Height'].max()
+
+    #[ST4]
+    userHeight = st.slider('Note: The height selected determines the # of taller skyscrapers:',
+                           min_value = int(minHeight),
+                           max_value = int(maxHeight),
+                           value = int(minHeight),
+                           step = 1)
+
+    #filter depending on userheight
+    filtered_data = dat[dat['Height'] >= userHeight]
+
+    #Print Statement
+    st.write(f"There are {len(filtered_data)} skyscrapers which are at least {userHeight} meters tall.")
+
+    if not filtered_data.empty:
+
+        if not filtered_data.empty:
+            important_columns = ['Name', 'City', 'Height', 'Floors', 'Material']
+            st.dataframe(filtered_data[important_columns])
+
+
+
 def main():
     st.title("Skyscrapers in the United States")
 
@@ -211,7 +238,8 @@ def main():
                             ["Overview Map",
                             "Skyscrapers Per City",
                             "Scatter Plot: Skyscrapers",
-                            "Material Analysis"])
+                            "Material Analysis",
+                             "Height Slider: Skyscrapers"])
 
     if menu == "Overview Map":
         inputCity = selectCity(dat, 'City')
@@ -229,6 +257,10 @@ def main():
     elif menu == "Material Analysis":
         st.header(f':blue[Average Skyscraper Height by Material]', divider='blue')
         skyscraperMaterialAnalysis(dat)
+
+    elif menu == "Height Slider: Skyscrapers":
+        st.header(f':blue[Count Skyscrapers by Height]', divider='blue')
+        countHeightSlider(dat)
 
 if __name__ == '__main__':
     main()
