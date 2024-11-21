@@ -28,11 +28,11 @@ def getData():
 
     return dat
 
-def selectCity(dat, column_name = 'City'): #[PY1]
+def selectCity(dat, column_name = 'City'): #[PY1] Column name = city makes function default to city if not specified
 
-    selectionList = sorted(set(dat[column_name]))  # [DA2]
+    selectionList = sorted(set(dat[column_name]))  # [DA2] Ensure each city only appears once (Sorted alphabetically)
 
-    selectInput = st.selectbox(f'Select {column_name}:', selectionList)  # [ST1]
+    selectInput = st.selectbox(f'Select {column_name}:', selectionList)  # [ST1] Uses streamlit widget to create a dropdown box
 
     return selectInput
 
@@ -49,7 +49,7 @@ def scraperByCityMap(dat, inputNames):
 
 
     #Create points on map for each skyscraper
-    scraperDots = pdk.Layer(
+    scraperDots = pdk.Layer( #Pydeck visualization tool to layer map visual
         "ScatterplotLayer",
         data = selectedCity,
         get_position = '[Longitude, Latitude]',
@@ -59,8 +59,8 @@ def scraperByCityMap(dat, inputNames):
 
     #Create display when hovering over dot (Pydeck)
 
-    tool_tip = {
-        'html': 'Name: <b>{Name}</b></br>'
+    tool_tip = { #Tooltip config for Pydeck Layer (Note: Need to be in HTML/CSS formatting for formatted text and style)
+        'html': 'Name: <b>{Name}</b></br>' # first key in the dictionary is displaying the content in html format
         'City: <b>{City}</b></br>'
         'Building Height: <b>{Height}m</b></br>'
         '# of Floors: <b>{Floors}</b></br>',
@@ -70,7 +70,7 @@ def scraperByCityMap(dat, inputNames):
     }
 
     # [MAP] Create the map and add the hover box on each skyscraperDot
-    skyscraperMap = pdk.Deck(
+    skyscraperMap = pdk.Deck( #Using pydeck visualization to create map
 
         map_style= 'light', #[ST4]
 
@@ -85,7 +85,7 @@ def scraperByCityMap(dat, inputNames):
 
 def skyscrapersPerCity(dat, max_cities=10):
 
-    # Get the unique list of cities from the data
+    # Get list of cities from the data (No duplicates)
     cities = sorted(dat['City'].unique())
 
     # [ST1] Streamlit widget to select a city
@@ -94,13 +94,10 @@ def skyscrapersPerCity(dat, max_cities=10):
     # Filter the data based on the selected city
     filtered_data = dat[dat['City'] == selected_city]
 
-    # Limit the number of skyscrapers to display (cut off after `max_cities`)
+    # Limit the number of skyscrapers to display (stop when reach max)
     if len(filtered_data) > max_cities:
         filtered_data = filtered_data.head(max_cities)
         st.write("Some skyscrapers were removed for visualization purposes.")
-
-    # Display the skyscrapers and their heights in a bar plot
-    st.header(f'Bar Chart of Skyscrapers in {selected_city}')
 
     # Plotting the bar chart (Matplotlib code examples formatting)
     plt.figure(figsize=(10, 6))
@@ -134,9 +131,6 @@ def scatterPlotSkyscrapers(dat):
 
         # Add the Height-to-Floor Ratio column for the table only
         top_skyscrapers['Height-to-Floor Ratio'] = top_skyscrapers['Height'] / top_skyscrapers['Floors']
-
-        # Scatter plot: Height vs. Floors
-        st.header("Scatter Plot: Height vs. Floors")
 
         plt.figure(figsize=(10, 6))
 
@@ -192,9 +186,6 @@ def skyscraperMaterialAnalysis(dat):
     if pivot_data.empty:
         st.warning("No skyscraper data available for the selected criteria.")
 
-    # [VIZ3] Bar chart for average heights by material
-    st.header("Average Skyscraper Height by Material")
-
     plt.figure(figsize=(10, 6))
     plt.bar(pivot_data['Material'], pivot_data['Height'], color='teal')
     plt.xlabel('Material')
@@ -203,7 +194,7 @@ def skyscraperMaterialAnalysis(dat):
     plt.xticks(rotation=45)
     plt.tight_layout()
 
-    # Display the plot
+    # [VIZ3] Display the plot
     st.pyplot(plt)
 
     # Display the pivot data in a table ([VIZ1]: Table visualization)
@@ -211,38 +202,33 @@ def skyscraperMaterialAnalysis(dat):
     st.write(pivot_data)
 
 def main():
-    st.title("Skyscrapers")
+    st.title("Skyscrapers in the United States")
 
     dat = getData()
 
-    inputCity = selectCity(dat, 'City')
-    st.header(f':blue[Map of Skyscrapers in {inputCity}]', divider='blue')
-    scraperByCityMap(dat, inputCity)
+    st.sidebar.title("All About Skyscrapers")
+    menu = st.sidebar.radio("Select a section:",
+                            ["Overview Map",
+                            "Skyscrapers Per City",
+                            "Scatter Plot: Skyscrapers",
+                            "Material Analysis"])
 
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
+    if menu == "Overview Map":
+        inputCity = selectCity(dat, 'City')
+        st.header(f':blue[Map of Skyscrapers in {inputCity}]', divider='blue')
+        scraperByCityMap(dat, inputCity)
 
+    elif menu == "Skyscrapers Per City":
+        st.header(f":blue[Analysis of Skyscrapers Per City]", divider='blue')
+        skyscrapersPerCity(dat)
 
-    skyscrapersPerCity(dat)
+    elif menu == "Scatter Plot: Skyscrapers":
+        st.header(f':blue[Comparing Height:Floor Ratio By City:]', divider='blue')
+        scatterPlotSkyscrapers(dat)
 
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
-
-    scatterPlotSkyscrapers(dat)
-
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
-
-    skyscraperMaterialAnalysis(dat)
+    elif menu == "Material Analysis":
+        st.header(f':blue[Average Skyscraper Height by Material]', divider='blue')
+        skyscraperMaterialAnalysis(dat)
 
 if __name__ == '__main__':
     main()
